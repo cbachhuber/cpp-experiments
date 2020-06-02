@@ -3,47 +3,77 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
+
+// TODO perform time msmt in macro
 
 static constexpr std::size_t kNumberOfElements{static_cast<std::size_t>(1e6)};
 
-int main() {
-    // std::vector<int> to_accumulate(kNumberOfElements);
-    std::array<int, kNumberOfElements> to_accumulate{};
-    std::fill(to_accumulate.begin(), to_accumulate.end(), 1);
+// TODO constrain to bidirectional iterators
+template <typename T>
+void accumulateInArrayUsingTransform(T& array) {
+    std::transform(array.begin(), std::prev(array.end()), std::next(array.begin()), std::next(array.begin()),
+                   [](int first, int second) { return first + second; });
+}
 
+template <typename T>
+void accumulateInArrayUsingForLoop(T& array) {
+    for (auto index{1U}; index < array.size(); ++index) {
+        array[index] = array[index] + array[index - 1];
+    }
+}
+
+template <typename T>
+void testAccumulate(T& array, const std::string& container_name) {
+    std::cout << "Performing tests on " << container_name << "\n";
     auto start = std::chrono::steady_clock::now();
-    std::transform(to_accumulate.begin(), std::prev(to_accumulate.end()), std::next(to_accumulate.begin()),
-                   std::next(to_accumulate.begin()), [](int first, int second) { return first + second; });
+    accumulateInArrayUsingTransform(array);
     auto end = std::chrono::steady_clock::now();
     std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
               << std::endl;
 
     start = std::chrono::steady_clock::now();
-    for (auto index{1U}; index < to_accumulate.size(); ++index) {
-        to_accumulate[index] = to_accumulate[index] + to_accumulate[index - 1];
-    }
+    accumulateInArrayUsingForLoop(array);
     end = std::chrono::steady_clock::now();
-    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
-              << std::endl;
+    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+              << "ms\n\n";
+}
 
-    auto to_accumulate_unique_ptr{std::make_unique<std::array<int, kNumberOfElements>>()};
-    std::fill(to_accumulate_unique_ptr->begin(), to_accumulate_unique_ptr->end(), 1);
-
-    start = std::chrono::steady_clock::now();
-    std::transform(to_accumulate_unique_ptr->begin(), std::prev(to_accumulate_unique_ptr->end()),
-                   std::next(to_accumulate_unique_ptr->begin()), std::next(to_accumulate_unique_ptr->begin()),
-                   [](int first, int second) { return first + second; });
-    end = std::chrono::steady_clock::now();
+template <typename T>
+void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
+    std::cout << "Performing tests on " << container_name << "\n";
+    auto start = std::chrono::steady_clock::now();
+    std::transform(array_ptr->begin(), std::prev(array_ptr->end()), std::next(array_ptr->begin()),
+                   std::next(array_ptr->begin()), [](int first, int second) { return first + second; });
+    auto end = std::chrono::steady_clock::now();
     std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
               << std::endl;
 
     start = std::chrono::steady_clock::now();
-    for (auto index{1U}; index < to_accumulate_unique_ptr->size(); ++index) {
-        (*to_accumulate_unique_ptr)[index] =
-            (*to_accumulate_unique_ptr)[index] + (*to_accumulate_unique_ptr)[index - 1];
+    for (auto index{1U}; index < array_ptr->size(); ++index) {
+        (*array_ptr)[index] = (*array_ptr)[index] + (*array_ptr)[index - 1];
     }
     end = std::chrono::steady_clock::now();
-    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
-              << std::endl;
+    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+              << "ms\n\n";
+}
+
+int main() {
+    // TODO perform multiple measurements
+    {
+        std::vector<int> to_accumulate(kNumberOfElements);
+        std::fill(to_accumulate.begin(), to_accumulate.end(), 1);
+        testAccumulate(to_accumulate, "std::vector");
+    }
+    {
+        std::array<int, kNumberOfElements> to_accumulate{};
+        std::fill(to_accumulate.begin(), to_accumulate.end(), 1);
+        testAccumulate(to_accumulate, "std::array");
+    }
+    {
+        auto to_accumulate{std::make_unique<std::array<int, kNumberOfElements>>()};
+        std::fill(to_accumulate->begin(), to_accumulate->end(), 1);
+        testAccumulatePtr(to_accumulate, "std::unique_ptr<std::array>");
+    }
 }
