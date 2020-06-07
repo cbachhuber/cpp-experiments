@@ -8,13 +8,12 @@ struct LinkedListElement {
     explicit LinkedListElement(T _value) : value{std::move(_value)} {}
     T value;
     std::unique_ptr<LinkedListElement<T>> next;
-//    std::unique_ptr<LinkedListElement<T>> previous;
 };
 
 template <typename T>
 class LinkedList {
   public:
-    LinkedList() : head{nullptr} {}
+    LinkedList() : head{nullptr}, number_of_elements{0U} {}
 
     void append(const T& value) {
         if (head == nullptr) {
@@ -28,10 +27,19 @@ class LinkedList {
         }
     }
 
+    std::size_t size() const {
+        return number_of_elements;
+    }
+
+    bool empty() const {
+        return 0U == number_of_elements;
+    }
+
 //    void insertAfter(const T& value, std::size_t position)
 
   private:
     std::unique_ptr<LinkedListElement<T>> head;
+    std::size_t number_of_elements;
 };
 
 // TODO implement iterator
