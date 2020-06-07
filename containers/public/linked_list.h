@@ -1,11 +1,15 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <experimental/optional>
 #include <memory>
+
+using std::experimental::optional;
 
 template <typename T>
 struct LinkedListElement {
     explicit LinkedListElement(T _value) : value{std::move(_value)} {}
+//    explicit LinkedListElement(T&& _value) : value{std::move(_value)} {}
     T value;
     std::unique_ptr<LinkedListElement<T>> next;
 };
@@ -15,27 +19,22 @@ class LinkedList {
   public:
     LinkedList() : head{nullptr}, number_of_elements{0U} {}
 
-    void append(const T& value) {
+    void emplace_front(T&& value) {
         if (head == nullptr) {
-            head = std::make_unique<LinkedListElement>(value);
+            head = std::make_unique<LinkedListElement<T>>(std::move(value));
         } else {
-            auto& element = head->next;
-            while(element->next != nullptr){
-                element = element->next;
-            }
-            element->next = std::make_unique<LinkedListElement>(value);
+            auto new_element = std::make_unique<LinkedListElement<T>>(std::move(value));
+            new_element->next = std::move(this->head);
+            this->head = std::move(new_element);
         }
+        ++number_of_elements;
     }
 
-    std::size_t size() const {
-        return number_of_elements;
-    }
+    optional<T> front() const { return this->empty() ? optional<T>{} : optional<T>{head->value}; }
 
-    bool empty() const {
-        return 0U == number_of_elements;
-    }
+    std::size_t size() const { return number_of_elements; }
 
-//    void insertAfter(const T& value, std::size_t position)
+    bool empty() const { return 0U == number_of_elements; }
 
   private:
     std::unique_ptr<LinkedListElement<T>> head;
