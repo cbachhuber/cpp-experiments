@@ -1,0 +1,4 @@
+add_executable(linked_list_spec linked_list_spec.cpp)
+target_link_libraries(linked_list_spec PRIVATE containers)
+
+add_gtest(linked_list_spec)
