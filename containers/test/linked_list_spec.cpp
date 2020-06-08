@@ -13,20 +13,29 @@ TEST(LinkedList, ShouldConstructWithNoElements) {
     const LinkedList<std::int32_t> unit{};
     EXPECT_EQ(0U, unit.size());
     EXPECT_TRUE(unit.empty());
-    EXPECT_FALSE(unit.front());
+}
+
+TEST(LinkedListFront, ShouldReturnReference) {
+    LinkedList<std::int32_t> unit{};
+
+    unit.emplace_front(4);
+    EXPECT_EQ(4, unit.front());
+    EXPECT_EQ(1U, unit.size());
+
+    unit.front() = 5;
+    EXPECT_EQ(5, unit.front());
+    EXPECT_EQ(1U, unit.size());
 }
 
 TEST(LinkedList, ShouldEmplaceAtFront) {
     LinkedList<std::int32_t> unit{};
 
     unit.emplace_front(4);
-    ASSERT_TRUE(unit.front());
-    EXPECT_EQ(4, unit.front().value());
+    EXPECT_EQ(4, unit.front());
 
     unit.emplace_front(5);
-    ASSERT_TRUE(unit.front());
     EXPECT_EQ(2, unit.size());
-    EXPECT_EQ(5, unit.front().value());
+    EXPECT_EQ(5, unit.front());
 }
 
 TEST(LinkedList, ShouldPopFirstItem){
@@ -40,5 +49,4 @@ TEST(LinkedList, ShouldPopFirstItem){
     EXPECT_EQ(4, unit.pop_front());
     EXPECT_EQ(0U, unit.size());
     EXPECT_TRUE(unit.empty());
-    EXPECT_FALSE(unit.front());
 }

@@ -1,15 +1,13 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#include <experimental/optional>
 #include <memory>
-
-using std::experimental::optional;
 
 template <typename T>
 struct LinkedListElement {
-    explicit LinkedListElement(T _value) : value{std::move(_value)} {}
-//    explicit LinkedListElement(T&& _value) : value{std::move(_value)} {}
+    explicit LinkedListElement(T&& _value) : value{std::move(_value)} {}
+    explicit LinkedListElement(const T& _value) : value{_value} {}
+
     T value;
     std::unique_ptr<LinkedListElement<T>> next;
 };
@@ -17,6 +15,7 @@ struct LinkedListElement {
 template <typename T>
 class LinkedList {
   public:
+    // TODO add constructor with std::initializer_list to enable const lists
     LinkedList() : head{nullptr}, number_of_elements{0U} {}
 
     void emplace_front(T&& value) {
@@ -37,8 +36,10 @@ class LinkedList {
         return result;
     }
 
-    // TODO refactor to have undefined behavior on empty list. Otherwise, references are difficult
-    optional<T> front() const { return this->empty() ? optional<T>{} : optional<T>{head->value}; }
+    // TODO test me when initializer_list constructor is implemented
+//    const T& front() const { return head->value; }
+
+    T& front() { return head->value; }
 
     std::size_t size() const { return number_of_elements; }
 
