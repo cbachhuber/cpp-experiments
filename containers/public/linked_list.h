@@ -30,6 +30,14 @@ class LinkedList {
         ++number_of_elements;
     }
 
+    T pop_front() {
+        const auto result = head->value;
+        head = std::move(head->next);
+        --number_of_elements;
+        return result;
+    }
+
+    // TODO refactor to have undefined behavior on empty list. Otherwise, references are difficult
     optional<T> front() const { return this->empty() ? optional<T>{} : optional<T>{head->value}; }
 
     std::size_t size() const { return number_of_elements; }

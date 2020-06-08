@@ -11,22 +11,34 @@ TEST(LinkedListElement, ShouldAssignConstructorArgumentsCorrectly) {
 
 TEST(LinkedList, ShouldConstructWithNoElements) {
     const LinkedList<std::int32_t> unit{};
-    EXPECT_EQ(0, unit.size());
+    EXPECT_EQ(0U, unit.size());
     EXPECT_TRUE(unit.empty());
     EXPECT_FALSE(unit.front());
 }
 
-TEST(LinkedList, ShouldEmplaceFrontWithOneElement) {
+TEST(LinkedList, ShouldEmplaceAtFront) {
     LinkedList<std::int32_t> unit{};
+
     unit.emplace_front(4);
     ASSERT_TRUE(unit.front());
     EXPECT_EQ(4, unit.front().value());
+
+    unit.emplace_front(5);
+    ASSERT_TRUE(unit.front());
+    EXPECT_EQ(2, unit.size());
+    EXPECT_EQ(5, unit.front().value());
 }
 
-TEST(LinkedList, ShouldEmplaceFrontWithTwoElements) {
+TEST(LinkedList, ShouldPopFirstItem){
     LinkedList<std::int32_t> unit{};
     unit.emplace_front(4);
     unit.emplace_front(5);
-    ASSERT_TRUE(unit.front());
-    EXPECT_EQ(5, unit.front().value());
+
+    EXPECT_EQ(5, unit.pop_front());
+    EXPECT_EQ(1U, unit.size());
+
+    EXPECT_EQ(4, unit.pop_front());
+    EXPECT_EQ(0U, unit.size());
+    EXPECT_TRUE(unit.empty());
+    EXPECT_FALSE(unit.front());
 }
