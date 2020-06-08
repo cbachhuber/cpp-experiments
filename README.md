@@ -35,6 +35,8 @@ For loop took 0ms
 
 Release mode actually reverts performance relations from debug mode! TODO: find why it is like that. How is STL linked and compiled?
 
+## Containers
+In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
 
 ## Notes
 Timings done on a MacBook Air 2012 sporting Ubuntu 18.04.
