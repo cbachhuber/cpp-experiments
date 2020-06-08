@@ -1,7 +1,9 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <iterator>
 #include <memory>
+#include <vector>
 
 template <typename T>
 struct LinkedListElement {
@@ -15,8 +17,14 @@ struct LinkedListElement {
 template <typename T>
 class LinkedList {
   public:
-    // TODO add constructor with std::initializer_list to enable const lists
     LinkedList() : head{nullptr}, number_of_elements{0U} {}
+    LinkedList(std::vector<T>&& elements) : head{nullptr}, number_of_elements{0U} {
+        for (auto element = std::make_move_iterator(elements.rbegin());
+             element != std::make_move_iterator(elements.rend()); ++element) {
+            // std::initializer_list elements are always const, can't be moved from. That's why we use vector
+            emplace_front(std::move(*element));
+        }
+    }
 
     void emplace_front(T&& value) {
         if (head == nullptr) {

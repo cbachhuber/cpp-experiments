@@ -50,3 +50,10 @@ TEST(LinkedList, ShouldPopFirstItem){
     EXPECT_EQ(0U, unit.size());
     EXPECT_TRUE(unit.empty());
 }
+
+TEST(LinkedList, ShouldUseInitializerListInGivenOrder){
+    LinkedList<std::int32_t> unit{{1,2}};
+    EXPECT_EQ(1, unit.pop_front());
+    EXPECT_EQ(2, unit.pop_front());
+}
+
