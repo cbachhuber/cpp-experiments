@@ -57,3 +57,7 @@ TEST(LinkedList, ShouldUseInitializerListInGivenOrder){
     EXPECT_EQ(2, unit.pop_front());
 }
 
+TEST(LinkedList, ShouldProvideConstAccessor){
+    const LinkedList<std::int32_t> unit{{1,2}};
+    EXPECT_EQ(1, unit.front());
+}

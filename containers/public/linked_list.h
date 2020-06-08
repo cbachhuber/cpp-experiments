@@ -44,8 +44,7 @@ class LinkedList {
         return result;
     }
 
-    // TODO test me when initializer_list constructor is implemented
-//    const T& front() const { return head->value; }
+    const T& front() const { return head->value; }
 
     T& front() { return head->value; }
 
