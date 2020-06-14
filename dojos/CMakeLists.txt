@@ -1,2 +1,2 @@
 add_executable(LengthOfLongestUniqueSubstring length_of_longest_unique_substring.cpp)
-add_executable(LongestPalidromeInString longest_palidrome_in_string.cpp)
+add_executable(LongestPalindromeInString longest_palindrome_in_string.cpp)
