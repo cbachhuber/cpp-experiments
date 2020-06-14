@@ -15,3 +15,4 @@ endif()
 add_executable(experiments main.cpp)
 
 add_subdirectory(containers)
+add_subdirectory(dojos)
