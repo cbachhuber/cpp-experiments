@@ -22,7 +22,7 @@ class LinkedList {
         for (auto element = std::make_move_iterator(elements.rbegin());
              element != std::make_move_iterator(elements.rend()); ++element) {
             // std::initializer_list elements are always const, can't be moved from. That's why we use vector
-            emplace_front(std::move(*element));
+            emplace_front(*element);
         }
     }
 
