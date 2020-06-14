@@ -1,6 +1,7 @@
-#include <iostream>
 #include <string>
 #include <vector>
+
+#include <utils.h>
 
 void appendParens(std::vector<std::string>& existing_combinations, int parens_to_open, int parens_to_close = 0) {
     if (parens_to_open == 0 && parens_to_close > 0) {
@@ -44,14 +45,6 @@ void appendParens(std::vector<std::string>& existing_combinations, int parens_to
             return;
         }
     }
-}
-
-template <typename T>
-void printContainerElements(const T& container) {
-    for (auto& element : container) {
-        std::cout << element << ", ";
-    }
-    std::cout << std::endl;
 }
 
 int main() {
