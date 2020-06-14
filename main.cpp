@@ -19,7 +19,8 @@ void accumulateInArrayUsingTransform(T& array) {
 
 template <typename T>
 void accumulateInArrayUsingForLoop(T& array) {
-    for (auto index{1U}; index < array.size(); ++index) {
+    const auto sz = array.size();
+    for (auto index{1U}; index < sz; ++index) {
         array[index] = array[index] + array[index - 1];
     }
 }
@@ -51,7 +52,8 @@ void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
               << std::endl;
 
     start = std::chrono::steady_clock::now();
-    for (auto index{1U}; index < array_ptr->size(); ++index) {
+    const auto sz = array_ptr->size();
+    for (auto index{1U}; index < sz; ++index) {
         (*array_ptr)[index] = (*array_ptr)[index] + (*array_ptr)[index - 1];
     }
     end = std::chrono::steady_clock::now();

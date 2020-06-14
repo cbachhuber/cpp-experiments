@@ -15,7 +15,7 @@ For loop took 31ms
 
 Performing tests on std::unique_ptr<std::array>
 Transform took 8ms
-For loop took 160ms
+For loop took 98ms (160ms when looking up size() at each iteration)
 ```
 
 - Results in release mode
