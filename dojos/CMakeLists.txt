@@ -6,4 +6,6 @@ add_executable(LongestPalindromeInString longest_palindrome_in_string.cpp)
 add_executable(CreateAllValidParensPatternsOfLength create_all_valid_parens_patterns_of_length.cpp)
 target_link_libraries(CreateAllValidParensPatternsOfLength PRIVATE utils)
 add_executable(ComputePossibleStepsOnStairs compute_possible_steps_on_stairs.cpp)
+add_executable(MergeSortedVectors merge_sorted_vectors.cpp)
+target_link_libraries(MergeSortedVectors PRIVATE utils)
 
