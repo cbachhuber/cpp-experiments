@@ -38,6 +38,9 @@ Release mode actually reverts performance relations from debug mode! TODO: find 
 ## Containers
 In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
 
+## Dojos/Katas for interview preparation
+Folder `dojos` contains dojos done for interview preparation (from books, not leetcode). Code style is not nice, writing that code without IDE as far as possible.
+
 ## Notes
 Timings done on a MacBook Air 2012 sporting Ubuntu 18.04.
 
