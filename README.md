@@ -15,7 +15,7 @@ For loop took 31ms
 
 Performing tests on std::unique_ptr<std::array>
 Transform took 8ms
-For loop took 98ms (160ms when looking up size() at each iteration)
+For loop took 98ms (160ms when looking up size() during each iteration)
 ```
 
 - Results in release mode
@@ -33,7 +33,18 @@ Transform took 3ms
 For loop took 0ms
 ```
 
-Release mode actually reverts performance relations from debug mode! TODO: find why it is like that. How is STL linked and compiled?
+Release mode inverts performance relations from debug mode! TODO: find why it is like that. How is STL linked and compiled?
+
+### Performance considerations
+
+First source [DrDobbs](https://www.drdobbs.com/stl-algorithms-vs-hand-written-loops/184401446).
+- (minor) Checking against `.end()` in each iteration of a hand-written for-loop could be bad. But `end()` is probably well optimized and inlined, so should be no issue. Release mode seems to optimize that away.
+- Library implementers use knowledge about containers to iterate faster (e.g. memory layout, internal data structure)
+- Non-trivial algorithms are super sophisticated. Not counting this one; we're doing trivial stuff here
+
+Summing up, this source does not explain enough what is going on.
+
+Next stop: find what release vs debug does
 
 ## Containers
 In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
