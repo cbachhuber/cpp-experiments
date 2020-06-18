@@ -33,7 +33,7 @@ Transform took 3ms
 For loop took 0ms
 ```
 
-Release mode inverts performance relations from debug mode! TODO: find why it is like that. How is STL linked and compiled?
+Release mode inverts performance relations from debug mode! Relative differences stay consistent for varying array/vector sizes. TODO: find why it is like that. How is STL linked and compiled?
 
 ### Performance considerations
 
@@ -44,7 +44,13 @@ First source [DrDobbs](https://www.drdobbs.com/stl-algorithms-vs-hand-written-lo
 
 Summing up, this source does not explain enough what is going on.
 
-Next stop: find what release vs debug does
+What does debug vs release: Seems to be similar in [gcc](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html) and [clang](https://clang.llvm.org/docs/CommandGuide/clang.html). CMake passes `-O3 -DNDEBUG` to the compiler, so highest standard-conform optimization. Which kinds of optimizations are done in a for loop? Which ones for `std::transform`?
+
+#### For-loop optimizations
+
+#### std::transform optimizations
+
+Alternative: you could look at the generated assembly code! use godbolt.org
 
 ## Containers
 In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
