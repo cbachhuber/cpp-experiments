@@ -52,7 +52,7 @@ void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
               << std::endl;
 
     start = std::chrono::steady_clock::now();
-    const auto sz = array_ptr->size();
+    const auto sz = array_ptr->size();  // no performance change in release mode, probably optimized away
     for (auto index{1U}; index < sz; ++index) {
         (*array_ptr)[index] = (*array_ptr)[index] + (*array_ptr)[index - 1];
     }
