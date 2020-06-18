@@ -46,11 +46,11 @@ Summing up, this source does not explain enough what is going on.
 
 What does debug vs release: Seems to be similar in [gcc](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html) and [clang](https://clang.llvm.org/docs/CommandGuide/clang.html). CMake passes `-O3 -DNDEBUG` to the compiler, so highest standard-conform optimization. Which kinds of optimizations are done in a for loop? Which ones for `std::transform`?
 
-#### For-loop optimizations
+#### Compiliation result (assembly) investigations
 
-#### std::transform optimizations
+Done using [godbolt](godbolt.org). Starting with accumulation of an `std::vector` to an int. range-based for loop and `std::accumulate` give the exact same assembly with `-O1` to `-O3`. Manual for-loop with indexing adds complexity: more complex setup and, at the end of each iteration, the addition result is moved to the return register. As expected, `std::array` allows significant simplicifation of the assembly code, in particular no dynamic length checking. Even the manual for-loop is not more complex.
 
-Alternative: you could look at the generated assembly code! use godbolt.org
+Current status on https://godbolt.org/z/oUuYh5
 
 ## Containers
 In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
