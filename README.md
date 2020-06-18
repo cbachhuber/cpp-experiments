@@ -33,7 +33,7 @@ Transform took 3ms
 For loop took 0ms
 ```
 
-Release mode inverts performance relations from debug mode! Relative differences stay consistent for varying array/vector sizes. TODO: find why it is like that. How is STL linked and compiled?
+Release mode inverts performance relations from debug mode! Relative differences stay consistent for varying array/vector sizes. Templates also don't matter, thanks to template instantiation. TODO: find why it is like that. How is STL linked and compiled?
 
 ### Performance considerations
 
@@ -62,5 +62,5 @@ Folder `dojos` contains dojos done for interview preparation (from books, not le
 Timings done on a MacBook Air 2012 sporting Ubuntu 18.04.
 
 ## TODOs
-- check for different array sizes
 - Test debug vs release
+- Compare assembly result of range-based for-loop vs `std::for_each` (expecting to be same)
