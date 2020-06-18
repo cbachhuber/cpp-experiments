@@ -31,14 +31,14 @@ void testAccumulate(T& array, const std::string& container_name) {
     auto start = std::chrono::steady_clock::now();
     accumulateInArrayUsingTransform(array);
     auto end = std::chrono::steady_clock::now();
-    std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
+    std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs"
               << std::endl;
 
     start = std::chrono::steady_clock::now();
     accumulateInArrayUsingForLoop(array);
     end = std::chrono::steady_clock::now();
-    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-              << "ms\n\n";
+    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+              << "µs\n\n";
 }
 
 template <typename T>
@@ -48,7 +48,7 @@ void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
     std::transform(array_ptr->begin(), std::prev(array_ptr->end()), std::next(array_ptr->begin()),
                    std::next(array_ptr->begin()), [](int first, int second) { return first + second; });
     auto end = std::chrono::steady_clock::now();
-    std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms"
+    std::cout << "Transform took " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "µs"
               << std::endl;
 
     start = std::chrono::steady_clock::now();
@@ -57,8 +57,8 @@ void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
         (*array_ptr)[index] = (*array_ptr)[index] + (*array_ptr)[index - 1];
     }
     end = std::chrono::steady_clock::now();
-    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-              << "ms\n\n";
+    std::cout << "For loop took " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+              << "µs\n\n";
 }
 
 int main() {
