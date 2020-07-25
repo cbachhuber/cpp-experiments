@@ -12,7 +12,7 @@ if(BUILD_TESTS)
     include (googletest)
 endif()
 
-add_executable(experiments main.cpp)
+add_executable(transform_performance transform_performance.cpp)
 
 add_subdirectory(containers)
 add_subdirectory(dojos)
