@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-// TODO perform time msmt in macro
+// TODO (chris) perform time msmt in macro
 
 static constexpr std::size_t kNumberOfElements{static_cast<std::size_t>(1e6)};
 
-// TODO constrain to bidirectional iterators
+// TODO (chris) constrain to bidirectional iterators
 template <typename T>
 void accumulateInArrayUsingTransform(T& array) {
     std::transform(array.begin(), std::prev(array.end()), std::next(array.begin()), std::next(array.begin()),
@@ -62,7 +62,7 @@ void testAccumulatePtr(T& array_ptr, const std::string& container_name) {
 }
 
 int main() {
-    // TODO perform multiple measurements
+    // TODO (chris) perform multiple measurements
     {
         std::vector<int> to_accumulate(kNumberOfElements);
         std::fill(to_accumulate.begin(), to_accumulate.end(), 1);
