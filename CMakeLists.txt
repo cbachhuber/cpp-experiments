@@ -13,6 +13,7 @@ if(BUILD_TESTS)
 endif()
 
 add_executable(transform_performance transform_performance.cpp)
+add_executable(std_bind_vs_lambda std_bind_vs_lambda.cpp)
 
 add_subdirectory(containers)
 add_subdirectory(dojos)
