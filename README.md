@@ -1,6 +1,7 @@
 # C++ Experiments
 
 ## Zipping with std::transform
+- Experiment done in file [transform_performance.cpp](/transform_performance.cpp)
 - Task: accumulate entries of array into same array
 - Tested solutions: for loop vs `std::transform`
 - Results in debug mode
@@ -53,7 +54,7 @@ Done using [godbolt](godbolt.org). Starting with accumulation of an `std::vector
 Current status on https://godbolt.org/z/oUuYh5
 
 ## Containers
-In folder `containers`, I'm currently playing with reimplementing STL containers, currently only `std::forward_list`.
+In folder `containers`, I'm playing with reimplementing STL containers, currently only `std::forward_list`.
 
 ## Dojos/Katas for interview preparation
 Folder `dojos` contains dojos done for interview preparation (from books, not leetcode). Code style is not nice, writing that code without IDE as far as possible.
