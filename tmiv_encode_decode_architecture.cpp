@@ -53,8 +53,9 @@ void writeToStream(Bitstream& stream, FunctionType&& function, std::size_t numbe
     }
 }
 
-// TODO(CB) extend to indexed (multi argument) setters
-// TODO(CB) this function signature is too constraining. You want to generalize to returning functions!
+// TODO(CB) extend to indexed (multi argument) setters, replace ArgumentType by Args..., then get last
+// TODO(CB) this function signature is too constraining. You want to generalize to returning functions! Replace void by
+// ReturnType, part of template
 template <typename ArgumentType>
 void readFromStream(Bitstream& stream, std::function<void(ArgumentType)> setter, std::size_t number_of_bits = 0) {
     if constexpr (std::is_same_v<bool, ArgumentType>) {
@@ -89,6 +90,11 @@ class Message {
     static Message decodeFrom(Bitstream& stream) {
         Message result{};
         // TODO(CB) can we get away without those lambdas? Is the current lambda requirement an architecture smell?
+        // You don't want to implement against the members; you need the checks.
+        // But what if the interface returns references? Then you can pass the references, and they interface does the
+        // check!
+        // Instead of getters and setters, you would implement const and non-const reference interfaces (see e.g. boost,
+        // they do it the same way though they're implementing containers)
         const std::function<void(std::int32_t)> set_my_int = [&result](std::int32_t value) { result.my_int(value); };
         const std::function<void(std::uint8_t)> set_my_optional = [&result](std::uint8_t value) {
             result.my_optional(value);
