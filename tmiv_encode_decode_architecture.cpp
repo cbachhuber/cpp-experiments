@@ -28,53 +28,48 @@ class Bitstream {
     }
 };
 
-template <typename T>
-auto putField(std::size_t i, std::ostream& stream, const std::string& fieldName, const T& fieldValue,
-              std::size_t /*number_of_bits*/ = 0) {
-    stream << fieldName << "(" << i << ")=";
-    if constexpr (std::is_same_v<std::uint8_t, std::decay_t<T>>) {
-        stream << static_cast<unsigned>(fieldValue) << "\n";
-    } else if (std::is_same_v<bool, std::decay_t<T>>) {
-        stream << std::boolalpha << fieldValue << "\n";
-    } else {
-        stream << fieldValue << "\n";
-    }
-}
+// TODO(CB) alternatively to overloading, you can pass optionals for the indices
+// const auto putField = [](std::size_t i, std::ostream& stream, const std::string& fieldName, const auto& fieldValue,
+//                         std::size_t /*number_of_bits*/ = 0) {
+//    stream << fieldName << "(" << i << ")=";
+//    if constexpr (std::is_same_v<std::uint8_t, std::decay_t<decltype(fieldValue)>>) {
+//        stream << static_cast<unsigned>(fieldValue) << "\n";
+//    } else if (std::is_same_v<bool, std::decay_t<decltype(fieldValue)>>) {
+//        stream << std::boolalpha << fieldValue << "\n";
+//    } else {
+//        stream << fieldValue << "\n";
+//    }
+//};
 
-template <typename T>
-auto putField(std::ostream& stream, const std::string& fieldName, const T& fieldValue,
-              std::size_t /*number_of_bits*/ = 0) {
+const auto putField = [](std::ostream& stream, const std::string& fieldName, const auto& fieldValue,
+                         std::size_t /*number_of_bits*/ = 0) {
     stream << fieldName << "=";
-    if constexpr (std::is_same_v<std::uint8_t, std::decay_t<T>>) {
+    if constexpr (std::is_same_v<std::uint8_t, std::decay_t<decltype(fieldValue)>>) {
         stream << static_cast<unsigned>(fieldValue) << "\n";
-    } else if (std::is_same_v<bool, std::decay_t<T>>) {
+    } else if (std::is_same_v<bool, std::decay_t<decltype(fieldValue)>>) {
         stream << std::boolalpha << fieldValue << "\n";
     } else {
         stream << fieldValue << "\n";
     }
-}
+};
 
-// Option: this function could take the string fieldName and not use it!
-auto writeToStream = [](Bitstream& stream, const std::string& /*field_name*/, const auto& value,
-                        std::size_t number_of_bits = 0) {
+const auto writeToStream = [](Bitstream& stream, const std::string& /*field_name*/, const auto& value,
+                              std::size_t number_of_bits = 0) {
     if constexpr (std::is_same_v<bool, std::decay_t<decltype(value)>>) {
         stream.putFlag(value);
-        // The below two could actually be summarized in an else statement
     } else {
         stream.writeBits<std::decay_t<decltype(value)>>(value, number_of_bits);
     }
 };
 
-// TODO(CB) extend to indexed (multi argument) setters, replace T by Args..., then get last
-template <typename T>
-void readFromStream(Bitstream& stream, const std::string& /*field_name*/, T& member_to_set,
-                    std::size_t number_of_bits = 0) {
-    if constexpr (std::is_same_v<bool, std::decay_t<T>>) {
+const auto readFromStream = [](Bitstream& stream, const std::string& /*field_name*/, auto& member_to_set,
+                               std::size_t number_of_bits = 0) {
+    if constexpr (std::is_same_v<bool, std::decay_t<decltype(member_to_set)>>) {
         member_to_set = stream.getFlag();
     } else {
-        member_to_set = stream.readBits<std::decay_t<T>>(number_of_bits);
+        member_to_set = stream.readBits<std::decay_t<decltype(member_to_set)>>(number_of_bits);
     }
-}
+};
 
 class Message {
   public:
@@ -93,29 +88,18 @@ class Message {
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Message& msg) {
-        const auto& ref = msg;
-        putField(stream, "my_int", ref.my_int(), bits_int);
-        putField(stream, "my_flag", ref.my_flag());
-        if (ref.my_flag()) {
-            putField(stream, "my_optional", ref.my_optional(), bits_optional_unsigned);
-        }
+        callSyntaxOnFunction(msg, stream, putField);
         return stream;
     }
 
     static Message decodeFrom(Bitstream& stream) {
         Message result{};
-        auto& ref = result;
-        readFromStream(stream, "my_int", ref.my_int(), bits_int);
-        readFromStream(stream, "my_flag", ref.my_flag());
-        if (result.my_flag()) {
-            readFromStream(stream, "my_optional", ref.my_optional(), bits_optional_unsigned);
-        }
+        callSyntaxOnFunction(result, stream, readFromStream);
         return result;
     }
 
     void encodeTo(Bitstream& stream) const { callSyntaxOnFunction(*this, stream, writeToStream); }
 
-    // TODO(CB) Not void for decodeFrom! But that's not an issue, this will anyways work on the reference to result
     template <typename MessageType, typename StreamType, typename FunctionType>
     static void callSyntaxOnFunction(MessageType&& msg, StreamType&& stream, FunctionType&& func) {
         // TODO(CB) verify that decayed Message type is Message (and reference?)
