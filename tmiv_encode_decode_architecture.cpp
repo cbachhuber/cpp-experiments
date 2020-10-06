@@ -10,7 +10,7 @@ constexpr std::size_t bits_int = 27;
 constexpr std::size_t bits_optional_unsigned = 5;
 
 template <typename T>
-auto putField(std::ostream& stream, const std::string& fieldName, T&& fieldValue) {
+auto putField(std::ostream& stream, const std::string& fieldName, const T& fieldValue) {
     stream << fieldName << "=";
     if constexpr (std::is_same_v<std::uint8_t, std::decay_t<T>>) {
         stream << static_cast<unsigned>(fieldValue) << "\n";
@@ -41,42 +41,41 @@ class Bitstream {
 };
 
 // Option: this function could take the string fieldName and not use it!
-template <typename FunctionType>
-void writeToStream(Bitstream& stream, FunctionType&& function, std::size_t number_of_bits = 0) {
-    if constexpr (std::is_same_v<bool, decltype(function())>) {
-        stream.putFlag(function());
+template <typename T>
+void writeToStream(Bitstream& stream, const T& value, std::size_t number_of_bits = 0) {
+    if constexpr (std::is_same_v<bool, std::decay_t<T>>) {
+        stream.putFlag(value);
         // The below two could actually be summarized in an else statement
-    } else if constexpr (std::is_same_v<std::int32_t, decltype(function())>) {
-        stream.writeBits<decltype(function())>(function(), number_of_bits);
-    } else if constexpr (std::is_same_v<std::uint8_t, decltype(function())>) {
-        stream.writeBits<decltype(function())>(function(), number_of_bits);
+    } else {
+        stream.writeBits<std::decay_t<T>>(value, number_of_bits);
     }
 }
 
-// TODO(CB) extend to indexed (multi argument) setters, replace ArgumentType by Args..., then get last
-// TODO(CB) this function signature is too constraining. You want to generalize to returning functions! Replace void by
-// ReturnType, part of template
-template <typename ArgumentType>
-void readFromStream(Bitstream& stream, std::function<void(ArgumentType)> setter, std::size_t number_of_bits = 0) {
-    if constexpr (std::is_same_v<bool, ArgumentType>) {
-        setter(stream.getFlag());
+// TODO(CB) extend to indexed (multi argument) setters, replace T by Args..., then get last
+template <typename T>
+void readFromStream(Bitstream& stream, T& member_to_set, std::size_t number_of_bits = 0) {
+    if constexpr (std::is_same_v<bool, std::decay_t<T>>) {
+        member_to_set = stream.getFlag();
     } else {
-        setter(stream.readBits<ArgumentType>(number_of_bits));
+        member_to_set = stream.readBits<std::decay_t<T>>(number_of_bits);
     }
 }
 
 class Message {
   public:
-    [[nodiscard]] constexpr auto my_int() const noexcept -> std::int32_t { return m_my_int; }
-    [[nodiscard]] constexpr auto my_flag() const noexcept -> bool { return m_flag_for_optional; }
-    [[nodiscard]] constexpr auto my_optional() const -> std::uint8_t {
+    [[nodiscard]] constexpr auto my_int() const noexcept -> std::int32_t const& { return m_my_int; }
+    [[nodiscard]] constexpr auto my_flag() const noexcept -> bool const& { return m_flag_for_optional; }
+    [[nodiscard]] constexpr auto my_optional() const -> std::uint8_t const& {
         assert(my_flag() && m_optional_uint.has_value());
         return m_optional_uint.value();
     }
 
-    void my_int(std::int32_t i) { m_my_int = i; }
-    void my_flag(bool flag) { m_flag_for_optional = flag; }
-    void my_optional(std::uint8_t val) { m_optional_uint = val; }
+    auto my_int() -> std::int32_t& { return m_my_int; }
+    auto my_flag() -> bool& { return m_flag_for_optional; }
+    auto my_optional() -> std::uint8_t& {
+        m_optional_uint.emplace(std::uint8_t{});
+        return *m_optional_uint;
+    }
 
     friend std::ostream& operator<<(std::ostream& stream, const Message& msg) {
         putField(stream, "my_int", msg.my_int());
@@ -89,35 +88,19 @@ class Message {
 
     static Message decodeFrom(Bitstream& stream) {
         Message result{};
-        // TODO(CB) can we get away without those lambdas? Is the current lambda requirement an architecture smell?
-        // You don't want to implement against the members; you need the checks.
-        // But what if the interface returns references? Then you can pass the references, and they interface does the
-        // check!
-        // Instead of getters and setters, you would implement const and non-const reference interfaces (see e.g. boost,
-        // they do it the same way though they're implementing containers)
-        const std::function<void(std::int32_t)> set_my_int = [&result](std::int32_t value) { result.my_int(value); };
-        const std::function<void(std::uint8_t)> set_my_optional = [&result](std::uint8_t value) {
-            result.my_optional(value);
-        };
-        const std::function<void(bool)> set_my_flag = [&result](bool value) { result.my_flag(value); };
-
-        readFromStream(stream, set_my_int, bits_int);
-        readFromStream(stream, set_my_flag);
+        readFromStream(stream, result.my_int(), bits_int);
+        readFromStream(stream, result.my_flag());
         if (result.my_flag()) {
-            readFromStream(stream, set_my_optional, bits_optional_unsigned);
+            readFromStream(stream, result.my_optional(), bits_optional_unsigned);
         }
         return result;
     }
 
     void encodeTo(Bitstream& stream) const {
-        const auto my_int_lambda = [this]() { return this->my_int(); };
-        const auto my_flag_lambda = [this]() { return this->my_flag(); };
-        const auto my_optional_lambda = [this]() { return this->my_optional(); };
-
-        writeToStream(stream, my_int_lambda, bits_int);
-        writeToStream(stream, my_flag_lambda);
+        writeToStream(stream, my_int(), bits_int);
+        writeToStream(stream, my_flag());
         if (my_flag()) {
-            writeToStream(stream, my_optional_lambda, bits_optional_unsigned);
+            writeToStream(stream, my_optional(), bits_optional_unsigned);
         }
     }
 
