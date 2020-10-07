@@ -11,6 +11,7 @@ constexpr std::size_t bits_int = 27;
 constexpr std::size_t bits_optional_unsigned = 5;
 constexpr std::size_t bits_vector_int = 22;
 
+// MivBitstream stub
 class Bitstream {
   public:
     void putFlag(bool /*flag*/) { std::cout << "Called putFlag\n"; }
@@ -30,13 +31,8 @@ class Bitstream {
     }
 };
 
-template <class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
+// We need to use lambdas with auto parameters here, as a function template cannot be passed as parameter to another
+// templated function, see https://stackoverflow.com/a/44120260/7260972
 const auto putField = [](std::ostream& stream, const std::string& fieldName, const auto& fieldValue,
                          std::size_t /*number_of_bits*/ = 0) {
     stream << fieldName << "=";
@@ -89,6 +85,14 @@ const auto readFromStreamIndexed = [](Bitstream& stream, std::size_t /*i*/, cons
     readFromStream(stream, "", member_to_set, number_of_bits);
 };
 
+// This is required to overload lambdas as in https://dev.to/tmr232/that-overloaded-trick-overloading-lambdas-in-c17
+template <class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
 class Message {
   public:
     [[nodiscard]] constexpr auto my_int() const noexcept -> std::int32_t const& { return m_my_int; }
@@ -130,7 +134,8 @@ class Message {
 
     template <typename MessageType, typename StreamType, typename FunctionType>
     static void callSyntaxOn(MessageType&& msg, StreamType&& stream, FunctionType&& func) {
-        // TODO(CB) verify that decayed Message type is Message (and reference?)
+        // We still need MessageType template parameter to cover const and non-const use cases
+        static_assert(std::is_same_v<Message, std::decay_t<MessageType>> && std::is_reference_v<MessageType>);
 
         func(stream, "my_int", msg.my_int(), bits_int);
         func(stream, "my_flag", msg.my_flag());
